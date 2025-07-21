@@ -53,7 +53,7 @@ namespace ADSearch {
         [Option('S', "spns", HelpText = "Enumerate and return all SPNS from AD.")]
         bool Spns { get; set; }
 
-        [Option("attributes", Default = "cn", HelpText = "Attributes to be returned from the results in csv format.")]
+        [Option('a', "attributes", Default = "cn", HelpText = "Attributes to be returned from the results in csv format.")]
         string Attribtues { get; set; }
 
         [Option('s', "search", HelpText = "Perform a custom search on the AD server.")]
@@ -61,6 +61,7 @@ namespace ADSearch {
 
         [Option("domain-admins", HelpText = "Attempt to retreive all Domain Admin accounts.")]
         bool DomainAdmins { get; set; }
+
     }
 
     class Options : IOutputOptions, IQueryOptions, IConnectionOptions {
@@ -99,6 +100,9 @@ namespace ADSearch {
         public string Attribtues { get; set; }
 
         public bool DomainAdmins { get; set; }
+
+        [Option('D', "distinguishedName", HelpText = "Specify a custom search base distinguished name (e.g. OU=Users,DC=example,DC=com).")]
+        public string DistinguishedName { get; set; }
 
         [Usage(ApplicationAlias = "ADSearch")]
         public static IEnumerable<Example> Examples {

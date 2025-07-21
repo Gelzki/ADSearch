@@ -15,11 +15,23 @@ namespace ADSearch {
         private const string PROTOCOL_PREFIX = "LDAP://";
 
         //Default constructor attempts to detrmine domain from current machine
-        public ADWrapper(bool json) {
+        public ADWrapper(bool json, string distinguishedName) {
             this.m_ldapString = GetCurrentDomainPath();
             this.m_domainPath = this.m_ldapString.Substring(PROTOCOL_PREFIX.Length);
             this.m_json = json;
-            this.m_directoryEntry = new DirectoryEntry(this.m_ldapString);
+            // Added below to allow supplication of DN or search base for OU walking
+            if (!string.IsNullOrEmpty(distinguishedName))
+            {
+                if (!distinguishedName.StartsWith("LDAP://", StringComparison.OrdinalIgnoreCase))
+                {
+                    distinguishedName = "LDAP://" + distinguishedName;
+                }
+                this.m_directoryEntry = new DirectoryEntry(distinguishedName);
+            }
+            else
+            {
+                this.m_directoryEntry = new DirectoryEntry(this.m_ldapString);
+            }
         }
 
         //Bind to FQDN with authentication if creds set else attempt anon bind
@@ -212,7 +224,16 @@ namespace ADSearch {
                 attributedResults[i] = new Dictionary<string, object>();
                 DirectoryEntry userEntry = results[i].GetDirectoryEntry();
                 foreach (string key in attrs) {
-                    attributedResults[i].Add(key, userEntry.Properties[key].Value);
+                    // attributedResults[i].Add(key, userEntry.Properties[key].Value);
+                    // Adding to fix and list OU
+                    if (userEntry.Properties.Contains(key) && userEntry.Properties[key].Value != null)
+                    {
+                        attributedResults[i].Add(key, userEntry.Properties[key].Value);
+                    }
+                    else
+                    {
+                        attributedResults[i].Add(key, "<null>");
+                    }
                 }
             }
 

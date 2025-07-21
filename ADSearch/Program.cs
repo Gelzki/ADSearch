@@ -56,7 +56,9 @@ GitHub: @tomcarver16
             } else {
                 //When no domain is supplied it has to be done locally even if the ip is set otherwise the bind won't work
                 OutputFormatting.PrintVerbose("No domain supplied. This PC's domain will be used instead");
-                AD = new ADWrapper(options.JsonOut);
+                // Pass in the user-supplied distinguished name, or an empty string if none was provided
+                string dn = options.DistinguishedName ?? "";
+                AD = new ADWrapper(options.JsonOut, dn);
             }
 
             if (options.Attribtues != null && !options.Full) {
